@@ -18,7 +18,7 @@ services:
     network_mode: host 
     privileged: true
     environment:
-      - IP=192.168.2.99
+      - IP=192.168.2.99 #change it with your server ip
     volumes:
       - $PWD/cloudboot/deploy/conf/cloudboot-server.conf:/etc/cloudboot-server/cloudboot-server.conf
       - $PWD/cloudboot/deploy/iso:/data/iso
