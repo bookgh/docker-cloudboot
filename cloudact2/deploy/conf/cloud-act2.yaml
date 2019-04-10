@@ -1,0 +1,79 @@
+# cloud-act2的配置
+
+### master的配置 ###
+############################
+is_master: true
+# 对外提供服务需要，监听的端口号，如果需要监听本地的，使用
+# 127.0.0.1:6868
+# 如果需要监听所有机器的，使用
+# :6868
+port: 6868
+independent: false
+cache_type: redis
+depend_redis: false
+crypto_type: aead
+pubsub: false
+## 密钥 必须是32位随机byte数据组再进行base64编码
+### 可以使用 head -c 32 /dev/urandom | base64 生成
+crypto_key: Uv38ByGCZU8WP18PmmIdcpVmx00QA3xNe7sEB9Hixkk=
+#
+#### mysql配置  ### 
+############################
+db:
+  user: root
+  password: 0okm#IJN
+  name: cloud-act2
+  encoding: utf8mb4
+  host: localhost
+  port: 3306
+  debug: true
+  pool_size: 20
+
+### master心跳监测定时任务配置
+heartbeat:
+  ## 心跳检测超时时间间隔
+  timeout_interval: 10m
+  ## 注册上报间隔
+  register_interval: 30m
+
+## job超时时间
+job_expire:
+  ## job超时的定时检测表达式
+  timeout_interval: 30m
+  ## job超时时间，整数，单位 s
+  expire: 10
+
+act2:
+  ## act2的master集群地址+端口，用于proxy回调使用
+  cluster_server: http://localhost:6868
+  acl: false
+  ## 提供认证方式，目前仅支持basic
+  acl_auth: basic
+
+##### 作业相关配置
+job:
+  #### 作业执行策略average|round|default|random.....
+  dist_strategy: average
+  #### 作业延时执行时间，单位s
+  delay_run: 3
+  cache_path: /usr/yunji/cloud-act2/cache/job
+
+#### 日志设定  ###
+############################
+# 日志文件路径地址
+log:
+# 业务相关的日志输出信息
+  file: /usr/yunji/cloud-act2/logs/cloud-act2.log
+  # http请求的日志信息，不支持rotate
+  http: /usr/yunji/cloud-act2/logs/cloud-http.log
+
+# 日志的输出级别
+# 支持：trace, debug, info, warning, error
+  level: debug
+
+# 日志时间格式
+#   - datefmt: '%Y-%m-%d %H:%M:%S'
+
+#### proxy集群设置  ### 
+############################
+# heartbeat-master:

@@ -1,0 +1,108 @@
+#### act2proxy  ###
+############################
+
+# 所在机房信息，英文名称，需要保证在部署的整个系统内保持唯一性
+# 一旦设定，后续不允许修改，所以务必需要保证产品持续可用
+idc: "hangzhou"
+is_master: false
+# 通道类型，可以为salt|puppet，ssh为默认值支持的，不需要设置
+channel_type: salt
+# 对外提供服务需要，监听的端口号，如果需要监听本地的，使用
+# 127.0.0.1:5555
+# 如果需要监听所有机器的，使用
+# :5555
+port: 5555
+depend_redis: false
+# salt服务器信息
+salt:
+  # salt账户
+  username: "salt-api"
+  password: "yunjikeji"
+  # salt所在的逻辑idc
+  syspath: "/srv/salt"
+
+  # salt的api服务器
+  server: http://localhost:8090
+
+## 加密类型,目前仅支持aead
+crypto_type: aead
+## 密钥 必须是32位随机byte数据组再进行base64编码
+## 可以使用 head -c 32 /dev/urandom | base64 生成
+crypto_key: Uv38ByGCZU8WP18PmmIdcpVmx00QA3xNe7sEB9Hixkk=
+ssh:
+  # 密码方式，native或者uri方式或keyUri方式
+  pass_method: native
+  # 密码方式的服务器地址，在pass_method为uri的时候使用，保留
+  pass_server: http://localhost:5000
+  cache: /var/cache/act2
+  ciphers:
+    - aes128-ctr
+    - aes192-ctr
+    - aes256-ctr
+    - aes128-cbc
+    - 3des-cbc
+
+  # 增加语言扩展模式，为远程机器上PATH路径上的名称，也可以使用绝对路径，但要求所有ssh登录的机器都使用一样的绝对路径。
+  lang:
+    - groovy
+
+act2:
+  ## act2的master集群地址+端口，用于proxy回调使用
+  ## act2_master_cluster_server为 ip:port
+  cluster_server: http://localhost:6868
+  ## 文件反向代理的proxy的对外开放的地址
+  proxy_server: http://localhost:5555
+  ## 是否支持文件下发的反向代理通道
+  file_reversed: true
+  ## 超时时间的修正值，必须大于0，默认3秒
+  timeout_correction: 3
+  ## 上报延时时间，单位秒，同一个idc下的delay_report必须不同
+  delay_report: 3
+  ## 是否需要支持acl的模式，如果需要的话，则需要添加用户名和角色对应的关系
+  acl: false
+  ## 提供认证方式，目前仅支持basic
+  acl_auth: basic
+
+### master心跳监测定时任务配置
+heartbeat:
+  ## 上报时间间隔，携带所有信息
+  report_interval: 300s
+  ## 心跳注册上报间隔
+  register_interval: 300s
+
+
+#### 日志设定  ###
+############################
+# 日志文件路径地址
+log:
+# 业务相关的日志输出信息
+  file: /usr/yunji/cloud-act2/logs/cloud-act2-proxy.log
+  # http请求的日志信息，不支持rotate
+  http: /usr/yunji/cloud-act2/logs/cloud-http.log
+
+# 日志的输出级别
+# 支持：trace, debug, info, warning, error
+  level: debug
+
+# 日志时间格式
+#   - datefmt: '%Y-%m-%d %H:%M:%S'
+
+
+# 主要是给文件下发时，minion通过proxy向文件服务器发起请求，最后获取到数据
+# 1. 文件服务器的地址，一般是用户的服务器地址，是个不确定的地址
+# 2. minion调用的文件服务器的url地址，也不受act2控制
+# 因此，为了能够让minion能够获取到文件服务器上的文件（可能存在minion访问文件服务器，出现网络不通的情况）
+# 需要在act2中篡改minion获取的文件服务器的url地址，让minion访问act2来获取文件，而act2则反向
+# 向具体的服务器发起请求获取文件，并下发给服务器，所以需要做一些规则修改
+# 让
+
+#reversed_proxy:
+#  # 可以被外部访问的服务地址(反向代理的服务器地址），该地址，可以用nginx来实现
+#  server: http://127.0.0.1:6767
+#  proxy:
+#    # 代理的名称
+#    - name: "default"
+#      # 文件
+#      api: "http://10.0.0.123"
+#      endpoints:
+#        - "/api"
