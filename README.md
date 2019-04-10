@@ -4,7 +4,9 @@ Thanks to [anjia0532](http://idcos.github.io) & [云霁科技](http://idcos.com/
 
 ## use 
 
-	git clone https://github.com/n3uz/docker-cloudboot.git && cd docker-cloudboot
+	git clone https://github.com/n3uz/docker-cloudboot.git 
+	cd docker-cloudboot
+	chmod +x cloudact2/delay_cloudact2.sh cloudboot/delay_cloudboot.sh	
 	
 修改 docker-compose.yml 中IP={YOUR SERVER IP}
 	
